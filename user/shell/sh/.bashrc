@@ -33,7 +33,8 @@ function command_not_found_handle {
     fi
 }
 
-PATH=$PATH:~/bin
+PATH="$HOME/bin:$PATH"
+PATH="$HOME/.local/bin:$PATH"
 export PATH
 export KUBE_EDITOR="code -w"
 export EDITOR="code"
@@ -44,4 +45,4 @@ if command -v brew &> /dev/null; then
 fi
 
 [[ -f <BLESH_PATH>/share/blesh/ble.sh ]] && source <BLESH_PATH>/share/blesh/ble.sh
-[[ :$SHELLOPTS: =~ :(vi|emacs): ]] && eval "$(<ATUIN_PATH> init bash <ATUIN_FLAGS>)"
+[[ :$SHELLOPTS: =~ :(vi|emacs): ]] && eval "$(<ATUIN_PATH>/bin/atuin init bash <ATUIN_FLAGS>)"

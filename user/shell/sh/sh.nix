@@ -19,7 +19,7 @@
   placeholders = {
     "BLESH_PATH" = toString pkgs.blesh;
     "ATUIN_PATH" = toString pkgs.atuin;
-    "ATUIN_FLAGS" = builtins.warn "${builtins.toJSON (config.programs.atuin.flags or [])}" (lib.escapeShellArgs (config.programs.atuin.flags or [])); # Access the flagsStr attribute
+    "ATUIN_FLAGS" = lib.escapeShellArgs (config.programs.atuin.flags or []); # Access the flagsStr attribute
   };
 
   # Function to replace placeholders with values
@@ -42,6 +42,7 @@ in {
     fd
     comma
     onefetch
+    oh-my-posh
   ];
 
   programs = {
@@ -80,6 +81,13 @@ in {
       enable = true;
       enableBashIntegration = false;
       enableZshIntegration = true;
+    };
+
+    oh-my-posh = {
+      enable = true;
+      useTheme = "powerlevel10k_rainbow";
+      enableFishIntegration = true;
+      enableBashIntegration = true;
     };
   };
 }

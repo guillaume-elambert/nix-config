@@ -15,63 +15,49 @@
   };
 
   outputs = inputs @ {self, ...}: let
-    # ---- SYSTEM SETTINGS ---- #
-    systemSettings = {
-      system = builtins.currentSystem or "x86_64-linux"; # system arch
-      profile = "wsl"; # select a profile defined from my profiles directory
-      timezone = "Europe/Paris"; # select timezone
-      locale = "en_US.UTF-8"; # select locale
-    };
+    # Import configuration from ./config.nix and get the 2 variables `systemSettings` and `userSettings`
+    config = import ./config.nix {inherit inputs;};
+    systemSettings = config.systemSettings;
+    userSettings =
+      config.userSettings
+      // {
+        # window manager type (hyprland or x11) translator
+        wmType =
+          if ((config.userSettings.wm == "hyprland") || (config.userSettings.wm == "plasma"))
+          then "wayland"
+          else "x11";
+        spawnBrowser =
+          if ((config.userSettings.browser == "qutebrowser") && (config.userSettings.wm == "hyprland"))
+          then "qutebrowser-hyprprofile"
+          else
+            (
+              if (config.userSettings.browser == "qutebrowser")
+              then "qutebrowser --qt-flag enable-gpu-rasterization --qt-flag enable-native-gpu-memory-buffers --qt-flag num-raster-threads=4"
+              else config.userSettings.browser
+            ); # Browser spawn command must be specail for qb, since it doesn't gpu accelerate by default (why?)
 
-    # ----- USER SETTINGS ----- #
-    userSettings = rec {
-      username = "gelambert"; # username
-      name = "Guillaume"; # name/identifier
-      email = "guillaume.elambert@yahoo.fr"; # email (used for certain configurations)
-      theme = "io"; # selcted theme from my themes directory (./themes/)
-      wm = "hyprland"; # Selected window manager or desktop environment; must select one in both ./user/wm/ and ./system/wm/
-      # window manager type (hyprland or x11) translator
-      wmType =
-        if ((wm == "hyprland") || (wm == "plasma"))
-        then "wayland"
-        else "x11";
-      browser = "brave"; # Default browser; must select one from ./user/app/browser/
-      spawnBrowser =
-        if ((browser == "qutebrowser") && (wm == "hyprland"))
-        then "qutebrowser-hyprprofile"
-        else
-          (
-            if (browser == "qutebrowser")
-            then "qutebrowser --qt-flag enable-gpu-rasterization --qt-flag enable-native-gpu-memory-buffers --qt-flag num-raster-threads=4"
-            else browser
-          ); # Browser spawn command must be specail for qb, since it doesn't gpu accelerate by default (why?)
-      term = "alacritty"; # Default terminal command;
-      font = "Intel One Mono"; # Selected font
-      fontPkg = "intel-one-mono"; # Font package
-      editor = "vim"; # Default editor;
-
-      # editor spawning translator
-      # generates a command that can be used to spawn editor inside a gui
-      # EDITOR and TERM session variables must be set in home.nix or other module
-      # I set the session variable SPAWNEDITOR to this in my home.nix for convenience
-      spawnEditor =
-        if (editor == "emacsclient")
-        then "emacsclient -c -a 'emacs'"
-        else
-          (
-            if
-              ((editor == "vim")
-                || (editor == "nvim")
-                || (editor == "nano"))
-            then "exec " + term + " -e " + editor
-            else
-              (
-                if (editor == "neovide")
-                then "neovide -- --listen /tmp/nvimsocket"
-                else editor
-              )
-          );
-    };
+        # editor spawning translator
+        # generates a command that can be used to spawn editor inside a gui
+        # EDITOR and TERM session variables must be set in home.nix or other module
+        # I set the session variable SPAWNEDITOR to this in my home.nix for convenience
+        spawnEditor =
+          if (config.userSettings.editor == "emacsclient")
+          then "emacsclient -c -a 'emacs'"
+          else
+            (
+              if
+                ((config.userSettings.editor == "vim")
+                  || (config.userSettings.editor == "nvim")
+                  || (config.userSettings.editor == "nano"))
+              then "exec " + config.userSettings.term + " -e " + config.userSettings.editor
+              else
+                (
+                  if (config.userSettings.editor == "neovide")
+                  then "neovide -- --listen /tmp/nvimsocket"
+                  else config.userSettings.editor
+                )
+            );
+      };
 
     useStable = (systemSettings.profile == "homelab") || (systemSettings.profile == "worklab");
 

@@ -3,11 +3,17 @@
   pkgs,
   userSettings,
   ...
-}: {
+}: let
+  homeEnv = builtins.getEnv "HOME";
+  homeValue =
+    if homeEnv != ""
+    then homeEnv
+    else "/home/" + userSettings.username;
+in {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = userSettings.username;
-  home.homeDirectory = "/home/" + userSettings.username;
+  home.homeDirectory = homeValue;
 
   programs.home-manager.enable = true;
   targets.genericLinux.enable = true;
