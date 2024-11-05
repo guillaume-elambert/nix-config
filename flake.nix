@@ -79,8 +79,8 @@
     # otherwise use nixos-unstable nixpkgs
     nixpkgs =
       if useStable
-      then builtins.warn "stable: ${inputs.nixpkgs-stable}" inputs.nixpkgs-stable
-      else builtins.warn "unstable: ${inputs.nixpkgs}" inputs.nixpkgs;
+      then inputs.nixpkgs-stable
+      else inputs.nixpkgs;
 
     lib = nixpkgs.lib;
 
@@ -96,8 +96,8 @@
     # otherwise use home-manager-unstable
     home-manager =
       if useStable
-      then builtins.warn "stable home-manager: ${inputs.home-manager-stable}" inputs.home-manager-stable
-      else builtins.warn "unstable home-manager: ${inputs.home-manager-unstable}" inputs.home-manager-unstable;
+      then inputs.home-manager-stable
+      else inputs.home-manager-unstable;
   in {
     homeConfigurations = {
       user = home-manager.lib.homeManagerConfiguration {

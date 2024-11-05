@@ -10,10 +10,10 @@
   home.homeDirectory = "/home/" + userSettings.username;
 
   programs.home-manager.enable = true;
-  targets.genericLinux.enable = builtins.warn "wsl pkgs ${pkgs.path}" true;
+  targets.genericLinux.enable = true;
 
   imports = [
-    ../../user/shell/sh.nix # My zsh and bash config
+    ../../user/shell/sh/sh.nix # My zsh and bash config
     ../../user/shell/cli-collection.nix # Useful CLI apps
     ../../user/shell/ops-collection.nix # Useful Ops apps
     #../../user/app/doom-emacs/doom.nix # My doom emacs config
