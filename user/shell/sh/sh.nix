@@ -14,7 +14,7 @@
     "," = "comma";
   };
 
-  myBashrc = builtins.readFile ./.bashrc;
+  myBashrc = builtins.readFile ./bash/.bashrc;
 
   placeholders = {
     "BLESH_PATH" = toString pkgs.blesh;
@@ -26,10 +26,25 @@
   replacePlaceholders = {
     str,
     placeholders,
-  }:
+  }: let
+    getKeysToReplace = key: ["\${${key}}" "\$${key}"];
+
+    # Create an array of values "placeholders.${key}"" that has the same lenght of (getKeysToReplace key)
+    getValuesToReplace = {
+      key,
+      keysList ? (getKeysToReplace key),
+    }:
+      builtins.map (_: placeholders.${key}) keysList;
+  in
     builtins.foldl' (
-      acc: key:
-        builtins.replaceStrings ["<${key}>"] [placeholders.${key}] acc
+      acc: key: let
+        keysList = getKeysToReplace key;
+        valuesList = getValuesToReplace {
+          key = key;
+          keysList = keysList;
+        };
+      in
+        builtins.replaceStrings keysList valuesList acc
     )
     str (builtins.attrNames placeholders);
 in {
@@ -70,12 +85,7 @@ in {
         str = myBashrc;
         placeholders = placeholders;
       };
-      # blesh.enable = true;
     };
-
-    # blesh = {
-    #   enable = true;
-    # };
 
     atuin = {
       enable = true;
