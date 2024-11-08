@@ -1,0 +1,542 @@
+#!/bin/bash
+alias k='kubectl'
+complete -F _complete_alias k
+
+alias kx='kubectx'
+alias kns='kubens'
+alias ksw='. ksw'
+
+alias kg="kubectl get"
+complete -F _complete_alias kg
+
+alias kgw="kubectl get -o=wide"
+alias kgy="kubectl get -o=yaml"
+complete -F _complete_alias kgw
+complete -F _complete_alias kgy
+
+alias kgd="kubectl get deployment"
+alias kgdw="kubectl get deployment -o=wide"
+alias kgdy="kubectl get deployment -o=yaml"
+complete -F _complete_alias kgd
+complete -F _complete_alias kgdw
+complete -F _complete_alias kgdy
+
+alias kgds="kubectl get daemonsets"
+alias kgdsw="kubectl get daemonsets -o=wide"
+alias kgdsy="kubectl get daemonsets -o=yaml"
+complete -F _complete_alias kgds
+complete -F _complete_alias kgdsw
+complete -F _complete_alias kgdsy
+
+alias kgi="kubectl get ingress"
+alias kgiw="kubectl get ingress -o=wide"
+alias kgiy="kubectl get ingress -o=yaml"
+complete -F _complete_alias kgi
+complete -F _complete_alias kgiw
+complete -F _complete_alias kgpy
+
+alias kgp="kubectl get pod"
+alias kgpw="kubectl get pod -o=wide"
+alias kgpy="kubectl get pod -o=yaml"
+complete -F _complete_alias kgp
+complete -F _complete_alias kgpw
+complete -F _complete_alias kgpy
+
+alias kgpv="kubectl get pv"
+alias kgpvw="kubectl get pv -o=wide"
+alias kgpvy="kubectl get pv -o=yaml"
+complete -F _complete_alias kgpv
+complete -F _complete_alias kgpvw
+complete -F _complete_alias kgpvy
+
+alias kgpvc="kubectl get pvc"
+alias kgpvcw="kubectl get pvc -o=wide"
+alias kgpvcy="kubectl get pvc -o=yaml"
+complete -F _complete_alias kgpvc
+complete -F _complete_alias kgpvcw
+complete -F _complete_alias kgpvcy
+
+alias kgr="kubectl get role"
+alias kgrw="kubectl get role -o=wide"
+alias kgry="kubectl get role -o=yaml"
+complete -F _complete_alias kgr
+complete -F _complete_alias kgrw
+complete -F _complete_alias kgry
+
+alias kgrb="kubectl get rolebinding"
+alias kgrbw="kubectl get rolebinding -o=wide"
+alias kgrby="kubectl get rolebinding -o=yaml"
+complete -F _complete_alias kgrb
+complete -F _complete_alias kgrbw
+complete -F _complete_alias kgrby
+
+alias kgs="kubectl get service"
+alias kgsw="kubectl get service -o=wide"
+alias kgsy="kubectl get service -o=yaml"
+
+complete -F _complete_alias kgs
+complete -F _complete_alias kgsw
+complete -F _complete_alias kgsy
+
+alias kgsa="kubectl get serviceaccount"
+alias kgsaw="kubectl get serviceaccount -o=wide"
+alias kgsay="kubectl get serviceaccount -o=yaml"
+complete -F _complete_alias kgsa
+complete -F _complete_alias kgsaw
+complete -F _complete_alias kgsay
+
+alias kgsc="kubectl get secret"
+alias kgscw="kubectl get secret -o=wide"
+alias kgscy="kubectl get secret -o=yaml"
+complete -F _complete_alias kgsc
+complete -F _complete_alias kgscw
+complete -F _complete_alias kgscy
+
+alias kd="kubectl describe"
+complete -F _complete_alias kd
+
+alias kdd="kubectl describe deployment"
+alias kdds="kubectl describe daemonset"
+alias kdi="kubectl describe ingress"
+alias kdp="kubectl describe pod"
+alias kdpv="kubectl describe pv"
+alias kdpvc="kubectl describe pvc"
+alias kdr="kubectl describe role"
+alias kdrb="kubectl describe rolebinding"
+alias kds="kubectl describe service"
+alias kdsa="kubectl describe serviceaccount"
+alias kdsc="kubectl describe secret"
+complete -F _complete_alias kdd
+complete -F _complete_alias kdds
+complete -F _complete_alias kdi
+complete -F _complete_alias kdp
+complete -F _complete_alias kdpv
+complete -F _complete_alias kdpvc
+complete -F _complete_alias kdr
+complete -F _complete_alias kdrb
+complete -F _complete_alias kds
+complete -F _complete_alias kdsa
+complete -F _complete_alias kdsc
+
+alias kdel="kubectl delete"
+alias kdelf="kubectl delete -f"
+complete -F _complete_alias kdel
+complete -F _complete_alias kdelf
+
+alias kdeld="kubectl delete deployment"
+alias kdelds="kubectl delete daemonset"
+alias kdeli="kubectl delete ingress"
+alias kdelp="kubectl delete pod"
+alias kdelpv="kubectl delete pv"
+alias kdelpvc="kubectl delete pvc"
+alias kdelr="kubectl delete role"
+alias kdelrb="kubectl delete rolebinding"
+alias kdels="kubectl delete service"
+alias kdelsa="kubectl delete serviceaccount"
+alias kdelsc="kubectl delete secret"
+complete -F _complete_alias kdeld
+complete -F _complete_alias kdelds
+complete -F _complete_alias kdeli
+complete -F _complete_alias kdelp
+complete -F _complete_alias kdelpv
+complete -F _complete_alias kdelpvc
+complete -F _complete_alias kdelr
+complete -F _complete_alias kdelrb
+complete -F _complete_alias kdels
+complete -F _complete_alias kdelsa
+complete -F _complete_alias kdelsc
+
+alias kl="kubectl logs"
+alias kcx="kubectl exec -it"
+alias kpf="kubectl port-forward"
+alias kaf="kubectl apply -f"
+complete -F _complete_alias kl
+complete -F _complete_alias kcx
+complete -F _complete_alias kdeli
+complete -F _complete_alias kpf
+complete -F _complete_alias kaf
+
+function run_kubectl_alias {
+    kubeconfig="$1"
+    context="$2"
+    app="$3"
+
+    # Check that all the arguments are not empty
+    if [ -z "$kubeconfig" ] || [ -z "$context" ] || [ -z "$app" ]; then
+        echo -e "\e[31mrun_kubectl_alias - Invalid arguments !\e[0m"
+        return 1
+    fi
+
+    echo -e "\e[38;5;214mSwitching to kubeconfig: \"${kubeconfig}\"...\e[0m"
+    local kubeconfig_back=$KUBECONFIG
+    export KUBECONFIG="${kubeconfig}"
+    local result=$?
+
+    echo -ne "\e[1A\e[0K"
+
+    if [ $result -ne 0 ] || [ ! -f "${kubeconfig}" ]; then
+        echo -e "\e[31mFailed to switch to kubeconfig: \"${kubeconfig}\" !\e[0m"
+        export KUBECONFIG=$kubeconfig_back
+        return 1
+    fi
+
+    echo -e "\e[32mSuccessfully switched to kubeconfig: \"${kubeconfig}\" !\e[0m"
+
+    echo -e "\e[38;5;214mSwitching to context: \"${context}\"...\e[0m"
+    kubectl config use-context "${context}" &>/dev/null
+    result=$?
+
+    echo -ne "\e[1A\e[0K"
+
+    if [ $result -ne 0 ]; then
+        echo -e "\e[31mFailed to switch to context: \"${context}\" !\e[0m"
+        return $result
+    fi
+
+    echo -e "\e[32mSuccessfully switched to context: \"${context}\" !\e[0m"
+
+    echo -e "\e[38;5;214mRunning \"${app}\"...\e[0m"
+
+    # Launch the app with the remaining arguments
+    ${app} "${@:4}"
+    result=$?
+
+    if [ $result -ne 0 ]; then
+        echo -e "\e[31mFailed to run \"${app}\" !\e[0m"
+        return $result
+    fi
+
+    echo -ne "\e[1A\e[0K"
+    echo -e "\e[32mSuccessfully ran \"${app}\" !\e[0m"
+}
+
+function generate_aliases_from_kubecontexts {
+    local app=$1
+    if [ -z "$app" ] || { ! type "$app" &>/dev/null && ! type "${1}.exe" &>/dev/null; }; then
+        return 1
+    fi
+
+    local prefix=${2:-""}
+    local return_instead_of_alias=0
+
+    # Check there is a 3rd argument
+    if [ $# -ge 3 ]; then
+        local return_instead_of_alias=1
+        local -n return_array=$3
+    else
+        declare -A return_array
+    fi
+
+    local contexts
+    local kubeconfig_back=$KUBECONFIG
+    local kubeconfig
+
+    if [ -z "$prefix" ]; then
+        export KUBECONFIG=$(realpath "$HOME/.kube/config")
+    else
+        export KUBECONFIG=$(realpath "$HOME/.kube/$prefix/config")
+    fi
+
+    kubeconfig="${KUBECONFIG}"
+    contexts=$(kubectl config get-contexts -o name)
+    export KUBECONFIG=$kubeconfig_back
+    prefix=$(echo $prefix | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
+
+    local context alias_name command begin end
+
+    for context in $contexts; do
+        # Remove any non-alphanumeric characters
+        alias_name=$(echo $context | tr -d '[:punct:]' | tr '[:upper:]' '[:lower:]')
+
+        case $alias_name in
+        *dev*)
+            begin=${alias_name%dev*}
+            end=${alias_name##*dev}
+            alias_name="${begin}d${end}"
+            ;;
+        *test*)
+            begin=${alias_name%test*}
+            end=${alias_name##*test}
+            alias_name="${begin}t${end}"
+            ;;
+        *pprod*)
+            begin=${alias_name%pprod*}
+            end=${alias_name##*pprod}
+            alias_name="${prefix}pp${end}"
+            ;;
+        *preprod*)
+            begin=${alias_name%preprod*}
+            end=${alias_name##*preprod}
+            alias_name="${begin}pp${end}"
+            ;;
+        *prod*)
+            begin=${alias_name%prod*}
+            end=${alias_name##*prod}
+            alias_name="${begin}p${end}"
+            ;;
+        esac
+
+        # If alias name does not start with the prefix
+        if [[ ! $alias_name =~ ^$prefix ]]; then
+            alias_name="${prefix}${alias_name}"
+        fi
+
+        command="# generate_aliases_from_kubecontexts::${app}::${2:-default}::${context}
+        run_kubectl_alias \"${kubeconfig}\" \"${context}\" \"${app}\" \$@"
+
+        [ $return_instead_of_alias -eq 1 ] &&
+            return_array["$alias_name"]=$command
+
+    done
+
+    if [ $return_instead_of_alias -eq 1 ]; then
+        return
+    fi
+
+    for alias_name in "${!return_array[@]}"; do
+        # Check if the alias already exists
+        if alias $alias_name &>/dev/null; then
+            continue
+        fi
+
+        local iterCount=0
+        local original_alias_name=$alias_name
+        local skip=0
+
+        # If the alias referes to a command that exists, skip it
+        while type $alias_name &>/dev/null; do
+            ((iterCount++))
+            # If the iterCount is greater than the length of the app, set the iterCount to the length of the app
+            if [ $iterCount -gt ${#app} ]; then
+                # Quit the while and for loop
+                skip=1
+                break
+            fi
+
+            # Get the iterCount many letters at the beginning of the app variable
+            alias_name="${app:0:$iterCount}${original_alias_name}"
+        done
+
+        if [ $skip -eq 1 ]; then
+            continue
+        fi
+
+        alias $alias_name="${return_array[$alias_name]}"
+    done
+}
+
+function generate_aliases_from_kubeconfigs {
+    local app=$1
+    # Check if the folder .kube exists
+    if [ ! -f $HOME/.kube ]; then
+        return 1
+    fi
+    
+    if [ -z "$app" ] || { ! type "$app" &>/dev/null && ! type "${1}.exe" &>/dev/null; }; then
+        echo "generate_aliases_from_kubeconfigs - Invalid app: $app"
+        return 1
+    fi
+
+    local configs
+    mapfile -d $'\0' configs < <(find -L $HOME/.kube -mindepth 2 -maxdepth 2 -type f -name 'config' -print0)
+
+    if [ -f "$HOME/.kube/config" ]; then
+        # Add the $HOME/.kube/config file as the first element of the array
+        configs=("$HOME/.kube/config" "${configs[@]}")
+    fi
+
+    local config
+    local prefix
+    declare -A aliases
+    declare -A new_aliases
+
+    for config in "${configs[@]}"; do
+        prefix=$(basename $(dirname ${config}))
+        # If the prefix is ".kube" the prefix is empty
+        [ "$prefix" == ".kube" ] && prefix=""
+
+        # Merge aliases with the new aliases
+        generate_aliases_from_kubecontexts "$app" "$prefix" "new_aliases"
+        for alias_name in "${!new_aliases[@]}"; do
+            if [ -z "${aliases[$alias_name]}" ]; then
+                aliases[$alias_name]=${new_aliases[$alias_name]}
+            fi
+        done
+        new_aliases=()
+    done
+
+    for alias_name in "${!aliases[@]}"; do
+        # Check if the alias already exists
+        if alias $alias_name &>/dev/null; then
+            continue
+        fi
+
+        local iterCount=0
+        local original_alias_name="${alias_name}"
+        local skip=0
+
+        # If the alias referes to a command that exists, skip it
+        while type "${alias_name}" &>/dev/null; do
+            ((iterCount++))
+            # If the iterCount is greater than the length of the app, set the iterCount to the length of the app
+            if [ $iterCount -gt ${#app} ]; then
+                # Quit the while and for loop
+                skip=1
+                break
+            fi
+
+            # Get the iterCount many letters at the beginning of the app variable
+            alias_name="${app:0:$iterCount}${original_alias_name}"
+        done
+
+        if [ $skip -eq 1 ]; then
+            continue
+        fi
+
+        alias $alias_name="${aliases[$original_alias_name]}"
+    done
+}
+
+function remove_kubectl_aliases {
+    local app=${1:-"[^:]*"}
+    local regex="^alias ([^=]+)='\\s*# generate_aliases_from_kubecontexts::(${app})::([^:]*)::(.*)"
+    local aliases
+    mapfile -t aliases < <(alias | grep -E "$regex")
+
+    if [ ${#aliases[@]} -eq 0 ]; then
+        return 1
+    fi
+
+    # Remove all the aliases that have the regex in the comment
+    for aliasIndex in "${!aliases[@]}"; do
+        if [[ ${aliases[$aliasIndex]} =~ $regex ]]; then
+            unalias ${BASH_REMATCH[1]}
+        fi
+    done
+}
+
+function kubectl_aliases {
+    local app=${1:-"[^:]*"}
+    local regex="^alias ([^=]+)='\\s*# generate_aliases_from_kubecontexts::(${app})::([^:]*)::(.*)"
+    local aliases
+    mapfile -t aliases < <(alias | grep -E "$regex")
+
+    if [ ${#aliases[@]} -eq 0 ]; then
+        echo "kubectl_aliases - No aliases found"
+        return 1
+    fi
+
+    local printConfig=$(
+        cat <<EOF
+[
+    {
+        "name": "Alias",
+        "regex_index": 1,
+        "min_width": 10
+    },
+    {
+        "name": "App",
+        "regex_index": 2,
+        "min_width": 5
+        
+    },
+    {
+        "name": "Kubeconfig",
+        "regex_index": 3,
+        "min_width": 10
+    },
+    {
+        "name": "Context",
+        "regex_index": 4,
+        "min_width": 10
+    }
+]
+EOF
+    )
+
+    # Each line is a json object and is an element of the array config
+    local config
+    local aliasIndex=0
+    local index=0
+    local max_length=()
+
+    readarray -t config <<<"$(echo "$printConfig" | jq -rc '.[]')"
+
+    for aliasIndex in "${!aliases[@]}"; do
+        if [[ ${aliases[$aliasIndex]} =~ $regex ]]; then
+            index=0
+            for bashRematch in "${BASH_REMATCH[@]}"; do
+                if (("${#bashRematch}" > "${max_length[$index]:-0}")); then
+                    max_length[$index]=${#bashRematch}
+                fi
+                ((index++))
+            done
+        fi
+    done
+
+    local additional_format='\e[1m\e[4m'
+    local column_format='\e[${COLOR}m %-${WIDTH}s \e[0m'
+    local header_format='${HEADER_STYLE}${HEADER_FORMAT}'
+    local separator_format='|'
+    local printf_format=""
+    local header_printf_format=""
+    local line width color currentFormat currentHeaderFormat sedCurrentFormat
+    local headers=()
+    local regexIndexes=()
+    index=0
+
+    additional_format=$(echo $additional_format | sed -e 's/[]\/$*.^[]/\\&/g')
+    for line in "${config[@]}"; do
+        local vars=$(echo "$line" | jq -r '"
+            local name=\"\(.name // "")\"
+            local regexIndex=\(.regex_index // "")
+            local min_width=\(.min_width // "")
+        "')
+        eval "$vars"
+
+        width=${min_width:-0}
+        regexIndexes+=($regexIndex)
+
+        if [ "${max_length[$regexIndex]:-0}" -gt $width ]; then
+            width=${max_length[$regexIndex]}
+        fi
+        # Check if the length of the name is greater than the width
+        if [ "${#name}" -gt "$width" ]; then
+            width=${#name}
+        fi
+
+        # Generate the printf format. it is one color for each column and the width of the column is the max length of the column
+        color=$((32 + index))
+
+        # Eval the printf format
+        currentFormat=$(echo "$column_format" | sed -e "s/\${WIDTH}/$width/g" -e "s/\${COLOR}/$color/g")
+        sedCurrentFormat=$(echo $currentFormat | sed -e 's/[]\/$*.^[]/\\&/g')
+        currentHeaderFormat=$(echo "$header_format" | sed -e "s/\${HEADER_STYLE}/$additional_format/g" -e "s/\${HEADER_FORMAT}/$sedCurrentFormat/g")
+        printf_format+="$currentFormat$separator_format"
+        header_printf_format+="$currentHeaderFormat$separator_format"
+        headers[index]=$name
+        ((index++))
+    done
+
+    # Remove the last separator
+    printf_format=${printf_format%$separator_format}
+    header_printf_format=${header_printf_format%$separator_format}
+    # Add a break line at the end
+    printf_format=" $printf_format \n"
+    header_printf_format=" $header_printf_format \n"
+
+    # Print the header in bold
+    printf "$header_printf_format" "${headers[@]}"
+
+    for index in "${!aliases[@]}"; do
+        if [[ ${aliases[$index]} =~ $regex ]]; then
+            # Get all the bash rematches values from witch index is in regexIndexes
+            local bashRematches=()
+            for regexIndex in "${regexIndexes[@]}"; do
+                bashRematches+=("${BASH_REMATCH[$regexIndex]}")
+            done
+            printf "$printf_format" "${bashRematches[@]}"
+        fi
+    done
+}
+alias ka="kubectl_aliases"

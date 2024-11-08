@@ -9,6 +9,8 @@
     if homeEnv != ""
     then homeEnv
     else "/home/" + userSettings.username;
+
+  userFolder = ../../user;
 in {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -19,16 +21,16 @@ in {
   targets.genericLinux.enable = true;
 
   imports = [
-    ../../user/shell/sh/sh.nix # My zsh and bash config
-    ../../user/shell/cli-collection.nix # Useful CLI apps
-    ../../user/shell/ops-collection.nix # Useful Ops apps
+    "${userFolder}/shell/sh/sh.nix" # My zsh and bash config
+    "${userFolder}/shell/cli-collection.nix" # Useful CLI apps
+    "${userFolder}/shell/ops-collection.nix" # Useful Ops apps
     #../../user/app/doom-emacs/doom.nix # My doom emacs config
     #../../user/app/ranger/ranger.nix # My ranger file manager config
     #../../user/app/git/git.nix # My git config
     #../../user/style/stylix.nix # Styling and themes for my apps
   ];
 
-  home.stateVersion = "22.11"; # Please read the comment before changing.
+  home.stateVersion = "24.05"; # Please read the comment before changing.
 
   home.packages = with pkgs; [
     # Core

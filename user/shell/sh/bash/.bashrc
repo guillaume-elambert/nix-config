@@ -60,6 +60,16 @@ fi
 source_files_in_folder ~/.bash_completion.d
 source_files_in_folder ~/.bash_alias
 
+# Create aliases for each kubeconfig and each kubecontext for the following apps
+apps_to_alias=("k9s")
+
+for app in "${apps_to_alias[@]}"; do
+    remove_kubectl_aliases $app
+    generate_aliases_from_kubeconfigs $app
+done
+
+# generate_aliases_from_kubecontexts k9s
+
 #==============================
 # START AUTO GENERATION BY NIX
 #==============================

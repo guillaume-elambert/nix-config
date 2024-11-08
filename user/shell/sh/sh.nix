@@ -4,49 +4,8 @@
   lib,
   ...
 }: let
-  # My shell aliases
-  myAliases = {
-    ls = "eza --icons -l -T -L=1";
-    cat = "bat";
-    htop = "btm";
-    fd = "fd -Lu";
-    gitfetch = "onefetch";
-    "," = "comma";
-  };
-
-  myBashrc = builtins.readFile ./bash/.bashrc;
-
-  placeholders = {
-    "BLESH_PATH" = toString pkgs.blesh;
-    "ATUIN_PATH" = toString pkgs.atuin;
-    "ATUIN_FLAGS" = lib.escapeShellArgs (config.programs.atuin.flags or []); # Access the flagsStr attribute
-  };
-
-  # Function to replace placeholders with values
-  replacePlaceholders = {
-    str,
-    placeholders,
-  }: let
-    getKeysToReplace = key: ["\${${key}}" "\$${key}"];
-
-    # Create an array of values "placeholders.${key}"" that has the same lenght of (getKeysToReplace key)
-    getValuesToReplace = {
-      key,
-      keysList ? (getKeysToReplace key),
-    }:
-      builtins.map (_: placeholders.${key}) keysList;
-  in
-    builtins.foldl' (
-      acc: key: let
-        keysList = getKeysToReplace key;
-        valuesList = getValuesToReplace {
-          key = key;
-          keysList = keysList;
-        };
-      in
-        builtins.replaceStrings keysList valuesList acc
-    )
-    str (builtins.attrNames placeholders);
+  # My shell aliases stored in ./aliases.nix
+  myAliases = import ./aliases.nix;
 in {
   home.packages = with pkgs; [
     eza
@@ -58,6 +17,10 @@ in {
     comma
     onefetch
     oh-my-posh
+  ];
+
+  imports = [
+    ./bash/bash.nix
   ];
 
   programs = {
@@ -75,16 +38,6 @@ in {
         bindkey '^P' history-beginning-search-backward
         bindkey '^N' history-beginning-search-forward
       '';
-    };
-
-    bash = {
-      enable = true;
-      enableCompletion = true;
-      shellAliases = myAliases;
-      bashrcExtra = replacePlaceholders {
-        str = myBashrc;
-        placeholders = placeholders;
-      };
     };
 
     atuin = {
