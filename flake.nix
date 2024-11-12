@@ -69,6 +69,7 @@
       else inputs.nixpkgs;
 
     lib = nixpkgs.lib;
+    custom-lib = import ./lib {inherit lib;};
 
     pkgs = import nixpkgs {
       system = systemSettings.system;
@@ -96,6 +97,7 @@
           inherit systemSettings;
           inherit userSettings;
           inherit inputs;
+          inherit custom-lib;
         };
       };
     };

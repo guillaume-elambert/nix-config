@@ -2,6 +2,7 @@
   config,
   pkgs,
   userSettings,
+  lib,
   ...
 }: let
   homeEnv = builtins.getEnv "HOME";
