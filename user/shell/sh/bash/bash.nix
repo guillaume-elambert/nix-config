@@ -2,6 +2,7 @@
   pkgs,
   config,
   lib,
+  custom-lib,
   ...
 }: let
   # My shell aliases stored in ./aliases.nix
@@ -55,13 +56,7 @@ in {
     };
   };
 
-  home.file = {
-    ".bash_completion.d" = {
-      source = ./.bash_completion.d;
-    };
-
-    ".bash_alias" = {
-      source = ./.bash_alias;
-    };
-  };
+  home.file =
+    (custom-lib.generateHomeFileEntries ./.bash_completion.d ".bash_completion.d")
+    // (custom-lib.generateHomeFileEntries ./.bash_alias ".bash_alias");
 }
